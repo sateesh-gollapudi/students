@@ -24,28 +24,6 @@
                 <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
             </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" name="term" placeholder="Search" aria-label="Search">
-            <!--            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" name="filter">Search</button>-->
-        </form>
+        <a href="logout.php" class="text-danger">Logout</a>
     </div>
 </nav>
-<?php
-if (!empty($_REQUEST['term'])) {
-
-    $term = mysqli_real_escape_string($conn, $_REQUEST['term']);
-    $sql = "SELECT * FROM student_register WHERE fname OR branch LIKE '%" . $term . "%'";
-    $r_query = mysqli_query($conn, $sql);
-    if ($r_query) {
-        while ($row = mysqli_fetch_array($r_query)) {
-            echo 'Primary key: ' . $row['id'];
-            echo '<br /> Code: ' . $row['fname'];
-            echo '<br /> Description: ' . $row['lname'];
-            echo '<br /> Category: ' . $row['email'];
-            echo '<br /> Cut Size: ' . $row['phno'];
-        }
-    }else{
-        die('Query not executed');
-    }
-}
-?>
