@@ -13,15 +13,29 @@ $branch_name = '';
 if (isset($_POST['bran']) && $_POST['bran']) {
     $branch_name = $_POST['bran'];
 }
+$year_value = '';
+if (isset($_POST['year']) && $_POST['year']) {
+    $year_value = $_POST['year'];
+}
 ?>
 <div class="container-fluid">
+    <?php if (isset($_SESSION['msg'])) : ?>
+        <div class="alert alert-danger mt-2">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <?php
+            echo $_SESSION['msg'];
+            unset($_SESSION['msg']);
+            ?>
+        </div>
+    <?php endif; ?>
     <div class="row">
         <div class="col-lg-3">
             <div class="card" style="border: none;">
                 <div class="card-body">
                     <form class="input-group my-2 my-lg-0">
-                        <input class="form-control mr-sm-2" type="search" name="term" placeholder="Enter Name" aria-label="Search">
-                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" name="fname">Search</button>
+                        <input class="form-control mr-sm-2" type="search" name="term" placeholder="Enter Name and hit enter" aria-label="Search">
                     </form>
                 </div>
             </div>
@@ -49,8 +63,7 @@ if (isset($_POST['bran']) && $_POST['bran']) {
             <div class="card" style="border: none;">
                 <div class="card-body">
                     <form class="input-group my-2 my-lg-0">
-                        <input class="form-control mr-sm-2" type="search" name="term" placeholder="Enter Email" aria-label="Search">
-                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" name="email">Search</button>
+                        <input class="form-control mr-sm-2" type="search" name="mail" placeholder="Enter Email and hit enter" aria-label="Search">                        
                     </form>
                 </div>
             </div>
@@ -58,6 +71,27 @@ if (isset($_POST['bran']) && $_POST['bran']) {
         <div class="col-lg-3">
             <div class="card" style="border: none;">
                 <div class="card-body">
+                    <form method="post" name="filter-year" id="sel">
+                        <div class="input-group">
+                            <select class="form-control mr-2" name="year" id="select">
+                                <option value="">Select Year</option>
+                                <option value="1" <?= ($year_value == '1') ? 'selected' : '' ?>>1</option>
+                                <option value="2" <?= ($year_value == '2') ? 'selected' : '' ?>>2</option>
+                                <option value="3" <?= ($year_value == '3') ? 'selected' : '' ?>>3</option>
+                                <option value="4" <?= ($year_value == '4') ? 'selected' : '' ?>>4</option>                                
+                            </select>
+                            <input type="submit" name="yearfilter" id="year" class="btn btn-outline-success" value="Filter" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3"></div>
+<!--********************************To filter branch and year combined***********************************************-->
+        <div class="col-lg-6">
+            <div class="card" style="border: none;">
+                <div class="card-body">
+                    <h3 class="text-center">For combined results</h3>
                     <form method="post" name="filter-branch" id="sel">
                         <div class="input-group">
                             <select class="form-control mr-2" name="bran" id="select">
@@ -68,12 +102,20 @@ if (isset($_POST['bran']) && $_POST['bran']) {
                                 <option value="mech" <?= ($branch_name == 'mech') ? 'selected' : '' ?>>MECHANICAL</option>
                                 <option value="eee" <?= ($branch_name == 'eee') ? 'selected' : '' ?>>EEE</option>
                             </select>
+                            <select class="form-control mr-2" name="year" id="select">
+                                <option value="">Select Year</option>
+                                <option value="1" <?= ($year_value == '1') ? 'selected' : '' ?>>1</option>
+                                <option value="2" <?= ($year_value == '2') ? 'selected' : '' ?>>2</option>
+                                <option value="3" <?= ($year_value == '3') ? 'selected' : '' ?>>3</option>
+                                <option value="4" <?= ($year_value == '4') ? 'selected' : '' ?>>4</option>                                
+                            </select>
                             <input type="submit" name="filter" id="filter" class="btn btn-outline-success" value="Filter" />
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+        <div class="col-lg-3"></div>
     </div>
 </div>
 <div class="container-fluid">
@@ -92,6 +134,7 @@ if (isset($_POST['bran']) && $_POST['bran']) {
             </tr>
         </thead>
         <tbody class="text-center">
+            <!--*******************************************Filter by Branch***************************************************-->
             <?php
             if (isset($_POST['filter'])) {
                 $bran = $_POST['bran'];
@@ -126,51 +169,129 @@ if (isset($_POST['bran']) && $_POST['bran']) {
                         <?php
                     }
                 } else {
-                    echo "<script>tostar.error('No records found');</script>";
+                    $_SESSION['msg'] = "No records found!";
                 }
             }
             ?>
+            <!--//******************************Filter by fname*****************************************************-->
             <?php
-            //******************************Filter by fname*****************************************************
-            if (isset($_POST['fname'])) {
-                if (!empty($_REQUEST['fname'])) {
-
-                    $term = mysqli_real_escape_string($conn, $_REQUEST['term']);
-                    $sql = "SELECT * FROM student_register WHERE fname OR lname LIKE '%" . $term . "%'";
-                    $r_query = mysqli_query($conn, $sql);
-                    if ($r_query) {
-                        while ($row = mysqli_fetch_array($r_query)) {
-                            $b_id = $row['id'];
-                            $b_fname = $row['fname'];
-                            $b_lname = $row['lname'];
-                            $b_email = $row['email'];
-                            $b_gender = $row['gender'];
-                            $b_phno = $row['phno'];
-                            $b_branch = $row['branch'];
-                            $b_year = $row['year'];
+            if (!empty($_REQUEST['term'])) {
+                $term = mysqli_real_escape_string($conn, $_REQUEST['term']);
+                $sql = "SELECT * FROM student_register WHERE fname OR lname LIKE '%" . $term . "%'";
+                $r_query = mysqli_query($conn, $sql);
+                if ($r_query) {
+                    while ($row = mysqli_fetch_array($r_query)) {
+                        $n_id = $row['id'];
+                        $n_fname = $row['fname'];
+                        $n_lname = $row['lname'];
+                        $n_email = $row['email'];
+                        $n_gender = $row['gender'];
+                        $n_phno = $row['phno'];
+                        $n_branch = $row['branch'];
+                        $n_year = $row['year'];
+//                                                    $b_image = $b['image'];
+                        ?>
+                        <tr>
+                            <td><?= $n_id; ?></td>
+                            <td><?= $n_fname; ?></td>
+                            <td><?= $n_lname; ?></td>
+                            <td><?= $n_email; ?></td>
+                            <td><?= $n_gender; ?></td>
+                            <td><?= $n_phno; ?></td>
+                            <td><?= $n_branch; ?></td>                                           
+                            <td><?= $n_year; ?></td>                                               
+                            <td>
+                                <i class="fas fa-user-edit mr-2 btn" onclick="filterstudentdetails('<?= $n_id; ?>')"></i> 
+                                <i class="fas fa-trash text-danger btn" onclick="filterdeletestudentdetails('<?= $n_id; ?>')"></i>
+                            </td>
+                        </tr> 
+                        <?php
+                    }
+                } else {
+                    $_SESSION['msg'] = 'No records found!';
+                }
+            }
+            ?>
+            <!--//******************************Filter by email*****************************************************-->
+            <?php
+            if (!empty($_REQUEST['mail'])) {
+                $term = mysqli_real_escape_string($conn, $_REQUEST['mail']);
+                $sql = "SELECT * FROM student_register WHERE email LIKE '%" . $term . "%'";
+                $r_query = mysqli_query($conn, $sql);
+                if ($r_query) {
+                    while ($row = mysqli_fetch_array($r_query)) {
+                        $n_id = $row['id'];
+                        $n_fname = $row['fname'];
+                        $n_lname = $row['lname'];
+                        $n_email = $row['email'];
+                        $n_gender = $row['gender'];
+                        $n_phno = $row['phno'];
+                        $n_branch = $row['branch'];
+                        $n_year = $row['year'];
+//                                                    $b_image = $b['image'];
+                        ?>
+                        <tr>
+                            <td><?= $n_id; ?></td>
+                            <td><?= $n_fname; ?></td>
+                            <td><?= $n_lname; ?></td>
+                            <td><?= $n_email; ?></td>
+                            <td><?= $n_gender; ?></td>
+                            <td><?= $n_phno; ?></td>
+                            <td><?= $n_branch; ?></td>                                           
+                            <td><?= $n_year; ?></td>                                               
+                            <td>
+                                <i class="fas fa-user-edit mr-2 btn" onclick="filterstudentdetails('<?= $n_id; ?>')"></i> 
+                                <i class="fas fa-trash text-danger btn" onclick="filterdeletestudentdetails('<?= $n_id; ?>')"></i>
+                            </td>
+                        </tr> 
+                        <?php
+                    }
+                } else {
+                    $_SESSION['msg'] = 'No records found!';
+                }
+            }
+            ?>
+            <!--********************************************Filter by Year*****************************************************-->
+            <?php
+            if (isset($_POST['year'])) {
+                $year = $_POST['year'];
+                $filter_year = "select * from student_register where year='" . $year . "'and status=1;";
+                $filter_y = mysqli_query($conn, $filter_year);
+                if ($filter_y) {
+//                    echo 'Entered first if'; exit;
+                    if (mysqli_num_rows($filter_y) != 0) {
+                        while ($y = mysqli_fetch_array($filter_y, MYSQLI_ASSOC)) {
+                            $y_id = $y['id'];
+                            $y_fname = $y['fname'];
+                            $y_lname = $y['lname'];
+                            $y_email = $y['email'];
+                            $y_gender = $y['gender'];
+                            $y_phno = $y['phno'];
+                            $y_branch = $y['branch'];
+                            $y_year = $y['year'];
 //                                                    $b_image = $b['image'];
                             ?>
                             <tr>
-                                <td><?= $b_id; ?></td>
-                                <td><?= $b_fname; ?></td>
-                                <td><?= $b_lname; ?></td>
-                                <td><?= $b_email; ?></td>
-                                <td><?= $b_gender; ?></td>
-                                <td><?= $b_phno; ?></td>
-                                <td><?= $b_branch; ?></td>                                           
-                                <td><?= $b_year; ?></td>                                               
+                                <td><?= $y_id; ?></td>
+                                <td><?= $y_fname; ?></td>
+                                <td><?= $y_lname; ?></td>
+                                <td><?= $y_email; ?></td>
+                                <td><?= $y_gender; ?></td>
+                                <td><?= $y_phno; ?></td>
+                                <td><?= $y_branch; ?></td>                                           
+                                <td><?= $y_year; ?></td>                                               
                                 <td>
-                                    <i class="fas fa-user-edit mr-2 btn" onclick="filterstudentdetails('<?= $b_id; ?>')"></i> 
-                                    <i class="fas fa-trash text-danger btn" onclick="filterdeletestudentdetails('<?= $b_id; ?>')"></i>
+                                    <i class="fas fa-user-edit mr-2 btn" onclick="filterstudentdetails('<?= $y_id; ?>')"></i> 
+                                    <i class="fas fa-trash text-danger btn" onclick="filterdeletestudentdetails('<?= $y_id; ?>')"></i>
                                 </td>
                             </tr> 
                             <?php
                         }
                     } else {
-                        echo "<script>tostar.error('No records found');</script>";
+                        $_SESSION['msg'] = "No records found!";
                     }
                 } else {
-                    die('Query not executed');
+                    echo("<script>tostar.error('Query not executed!');</script>");
                 }
             }
             ?>
