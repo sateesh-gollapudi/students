@@ -10,4 +10,3 @@ if (empty($_SESSION["is_logged_in"])) {
     exit();
 }
 ?>
-<a href="<?= ROOT?>admin/logout.php">Logout</a>
