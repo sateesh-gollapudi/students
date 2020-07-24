@@ -1,0 +1,92 @@
+.container-fluid{
+    margin: 0px;
+}
+body {        
+    font-family: 'helvetica neue';
+    overflow-x: hidden;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 250px;
+}
+.circular-img{
+    display:inline-block;
+    padding:10px;
+    border-radius:50%;
+    background:transparent;
+    height:120px;
+    width:120px;
+}
+.circular-img img{
+    display:inline-block;
+    margin-top:5px;
+    margin-left:10px
+}
+/*for mobile view*/
+/*@media only screen and (max-width: 640px) {
+.circular-image{
+        border-radius:50%;
+}*/
+/*//Login button*/
+.login-button {
+	-moz-box-shadow:inset -3px -5px 15px 4px rgba(0, 0, 0, 0);
+	-webkit-box-shadow:inset -3px -5px 15px 4px rgba(0, 0, 0, 0);
+	box-shadow:inset -3px -5px 15px 4px rgba(0, 0, 0, 0);
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #760ee6), color-stop(1, #a45df0) );
+	background:-moz-linear-gradient( center top, #760ee6 5%, #a45df0 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#760ee6', endColorstr='#a45df0');
+	background-color:#760ee6;
+	-webkit-border-top-left-radius:32px;
+	-moz-border-radius-topleft:32px;
+	border-top-left-radius:32px;
+	-webkit-border-top-right-radius:32px;
+	-moz-border-radius-topright:32px;
+	border-top-right-radius:32px;
+	-webkit-border-bottom-right-radius:32px;
+	-moz-border-radius-bottomright:32px;
+	border-bottom-right-radius:32px;
+	-webkit-border-bottom-left-radius:32px;
+	-moz-border-radius-bottomleft:32px;
+	border-bottom-left-radius:32px;
+text-indent:0;
+	border:1px solid #8d2cf5;
+	display:inline-block;
+	color:#ffffff;
+	font-family:arial;
+	font-size:15px;
+	font-weight:bold;
+	font-style:normal;
+height:49px;
+	line-height:49px;
+width:188px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:4px 0px 0px #7f03fc;
+}
+.login-button:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #a45df0), color-stop(1, #760ee6) );
+	background:-moz-linear-gradient( center top, #a45df0 5%, #760ee6 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#a45df0', endColorstr='#760ee6');
+	background-color:#a45df0;
+}
+.login-button:active {
+	position:relative;
+	top:1px;
+}
+#for-reg{
+    text-decoration: none;
+    color:#7f03fc;
+}
+#for-reg:hover{
+    color: #a45df0;
+}
+#show-up{
+    padding: 8% 2%;
+}
+/*#login-box{
+    padding: 8% 2%;
+}*/
+#register-box{
+    padding: 6% 2%;
+}
