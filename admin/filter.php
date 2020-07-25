@@ -17,6 +17,14 @@ $year_value = '';
 if (isset($_POST['year']) && $_POST['year']) {
     $year_value = $_POST['year'];
 }
+$cbranch_name = '';
+if (isset($_POST['cbran']) && $_POST['cbran']) {
+    $cbranch_name = $_POST['cbran'];
+}
+$cyear_value = '';
+if (isset($_POST['cyear']) && $_POST['cyear']) {
+    $cyear_value = $_POST['cyear'];
+}
 ?>
 <div class="container-fluid">
     <?php if (isset($_SESSION['msg'])) : ?>
@@ -87,29 +95,29 @@ if (isset($_POST['year']) && $_POST['year']) {
             </div>
         </div>
         <div class="col-lg-3"></div>
-<!--********************************To filter branch and year combined***********************************************-->
+        <!--********************************To filter branch and year combined***********************************************-->
         <div class="col-lg-6">
             <div class="card" style="border: none;">
                 <div class="card-body">
                     <h3 class="text-center">For combined results</h3>
-                    <form method="post" name="filter-branch" id="sel">
+                    <form method="post" name="filter-branch" id="csel">
                         <div class="input-group">
-                            <select class="form-control mr-2" name="bran" id="select">
+                            <select class="form-control mr-2" name="cbran" id="cbran">
                                 <option value="">Select Branch</option>
-                                <option value="cse" <?= ($branch_name == 'cse') ? 'selected' : '' ?>>CSE</option>
-                                <option value="ece" <?= ($branch_name == 'ece') ? 'selected' : '' ?>>ECE</option>
-                                <option value="civil" <?= ($branch_name == 'civil') ? 'selected' : '' ?>>CIVIL</option>
-                                <option value="mech" <?= ($branch_name == 'mech') ? 'selected' : '' ?>>MECHANICAL</option>
-                                <option value="eee" <?= ($branch_name == 'eee') ? 'selected' : '' ?>>EEE</option>
+                                <option value="cse" <?= ($cbranch_name == 'cse') ? 'selected' : '' ?>>CSE</option>
+                                <option value="ece" <?= ($cbranch_name == 'ece') ? 'selected' : '' ?>>ECE</option>
+                                <option value="civil" <?= ($cbranch_name == 'civil') ? 'selected' : '' ?>>CIVIL</option>
+                                <option value="mech" <?= ($cbranch_name == 'mech') ? 'selected' : '' ?>>MECHANICAL</option>
+                                <option value="eee" <?= ($cbranch_name == 'eee') ? 'selected' : '' ?>>EEE</option>
                             </select>
-                            <select class="form-control mr-2" name="year" id="select">
+                            <select class="form-control mr-2" name="cyear" id="cyear">
                                 <option value="">Select Year</option>
-                                <option value="1" <?= ($year_value == '1') ? 'selected' : '' ?>>1</option>
-                                <option value="2" <?= ($year_value == '2') ? 'selected' : '' ?>>2</option>
-                                <option value="3" <?= ($year_value == '3') ? 'selected' : '' ?>>3</option>
-                                <option value="4" <?= ($year_value == '4') ? 'selected' : '' ?>>4</option>                                
+                                <option value="1" <?= ($cyear_value == '1') ? 'selected' : '' ?>>1</option>
+                                <option value="2" <?= ($cyear_value == '2') ? 'selected' : '' ?>>2</option>
+                                <option value="3" <?= ($cyear_value == '3') ? 'selected' : '' ?>>3</option>
+                                <option value="4" <?= ($cyear_value == '4') ? 'selected' : '' ?>>4</option>                                
                             </select>
-                            <input type="submit" name="filter" id="filter" class="btn btn-outline-success" value="Filter" />
+                            <input type="submit" name="cfilter" id="cfilter" class="btn btn-outline-success" value="Filter" />
                         </div>
                     </form>
                 </div>
@@ -295,6 +303,48 @@ if (isset($_POST['year']) && $_POST['year']) {
                 }
             }
             ?>
+            <!--*******************************************************Combined Filter************************************************-->
+            <?php
+            if (isset($_POST['cfilter'])) {
+                $cb = $_POST['cbran'];
+                $cy = $_POST['cyear'];
+                $cs = "select * from student_register where branch='" . $cb . "'and year='" . $cy . "'and status=1";
+                $csq = mysqli_query($conn, $cs);
+                if ($csq) {
+                    if (mysqli_num_rows($csq) != 0) {
+                        while ($cf = mysqli_fetch_array($csq, MYSQLI_ASSOC)) {
+                            $cf_id = $cf['id'];
+                            $cf_fname = $cf['fname'];
+                            $cf_lname = $cf['lname'];
+                            $cf_email = $cf['email'];
+                            $cf_gender = $cf['gender'];
+                            $cf_phno = $cf['phno'];
+                            $cf_branch = $cf['branch'];
+                            $cf_year = $cf['year'];
+//                                                    $b_image = $b['image'];
+                            ?>
+                            <tr>
+                                <td><?= $cf_id; ?></td>
+                                <td><?= $cf_fname; ?></td>
+                                <td><?= $cf_lname; ?></td>
+                                <td><?= $cf_email; ?></td>
+                                <td><?= $cf_gender; ?></td>
+                                <td><?= $cf_phno; ?></td>
+                                <td><?= $cf_branch; ?></td>                                           
+                                <td><?= $cf_year; ?></td>                                               
+                                <td>
+                                    <i class="fas fa-user-edit mr-2 btn" onclick="filterstudentdetails('<?= $cf_id; ?>')"></i> 
+                                    <i class="fas fa-trash text-danger btn" onclick="filterdeletestudentdetails('<?= $cf_id; ?>')"></i>
+                                </td>
+                            </tr> 
+                            <?php
+                        }
+                    } else {
+                        $_SESSION['msg'] = "No records found!";
+                    }
+                }
+            }
+            ?>
         </tbody>
     </table>
 </div>
@@ -374,17 +424,24 @@ if (isset($_POST['edit'])) {
     }
 }
 ?>
-<script>
+<script>    
     $('document').ready(function () {
-        $('#sel').submit(function () {
-            let branch = $('#select').val();
-            if (branch == '') {
-                toastr.error("Select branch to display");
-                $('#select').focus();
+        $('#csel').first().submit(function(){
+            let cbran = $('#cbran').val();
+            let cyear = $('#cyear').val();
+            if(cbran == ''){
+                toastr.error('Select Branch');
+                $('#cbran').focus();
+                return false;
+            }
+            if(cyear == ''){
+                toastr.error('Select Year');
+                $('#cyear').focus();
                 return false;
             }
         });
     });
+
     function filterstudentdetails(id) {
         var formdata = {'id': id, 'type': 'edit'};
         var url = '<?= ROOT ?>admin/ajax.php';
