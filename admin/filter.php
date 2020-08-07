@@ -5,8 +5,7 @@ require_once 'header.php';
 require_once 'admin_nav.php';
 if (empty($_SESSION["is_logged_in"])) {
     session_destroy();
-    echo ("<script>toastr.error('Session Expired please login again');</script>");
-    header("refresh:1;url=login.php");
+    header("Location: login.php");
     exit();
 }
 $branch_name = '';
@@ -25,26 +24,20 @@ $cyear_value = '';
 if (isset($_POST['cyear']) && $_POST['cyear']) {
     $cyear_value = $_POST['cyear'];
 }
+//if (isset($_SESSION['msg'])) {
+//    echo '<script>toastr.warning("No records found!");</script>';
+//    unset($_SESSION['login']);
+//}
 ?>
-<div class="container-fluid">
-    <?php if (isset($_SESSION['msg'])) : ?>
-        <div class="alert alert-danger mt-2">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <?php
-            echo $_SESSION['msg'];
-            unset($_SESSION['msg']);
-            ?>
-        </div>
-    <?php endif; ?>
+<div class="container-fluid">    
     <div class="row">
         <div class="col-lg-3">
             <div class="card" style="border: none;">
                 <div class="card-body">
                     <form class="input-group my-2 my-lg-0">
                         <input class="form-control mr-sm-2" type="search" name="term" placeholder="Enter Name and hit enter" aria-label="Search">
-                    </form>
+                        <a href="<?php ROOT . 'admin/filer.php' ?>" class="btn btn-outline-warning">Clear</a>
+                    </form>                    
                 </div>
             </div>
         </div>
@@ -127,6 +120,14 @@ if (isset($_POST['cyear']) && $_POST['cyear']) {
     </div>
 </div>
 <div class="container-fluid">
+    <?php if (isset($_SESSION['msg'])): ?>
+        <div class="alert alert-warning d-none" id="error">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <?php echo $_SESSION['msg']; ?>
+        </div>
+    <?php endif; ?>
     <table class="table table-hover" id="filter-table">
         <thead>
             <tr class="text-center">
@@ -178,16 +179,20 @@ if (isset($_POST['cyear']) && $_POST['cyear']) {
                     }
                 } else {
                     $_SESSION['msg'] = "No records found!";
+                    echo '<script> '
+                    . '$("document").ready(function(){'
+                    . '$("#error").removeClass("d-none");'
+                    . '}); </script>';
                 }
             }
             ?>
-            <!--//******************************Filter by fname*****************************************************-->
+            <!--//******************************Filter by name*****************************************************-->
             <?php
             if (!empty($_REQUEST['term'])) {
                 $term = mysqli_real_escape_string($conn, $_REQUEST['term']);
                 $sql = "SELECT * FROM student_register WHERE fname OR lname LIKE '%" . $term . "%'";
                 $r_query = mysqli_query($conn, $sql);
-                if ($r_query) {
+                if (mysqli_num_rows($r_query) > 0) {
                     while ($row = mysqli_fetch_array($r_query)) {
                         $n_id = $row['id'];
                         $n_fname = $row['fname'];
@@ -217,6 +222,10 @@ if (isset($_POST['cyear']) && $_POST['cyear']) {
                     }
                 } else {
                     $_SESSION['msg'] = 'No records found!';
+                    echo '<script> '
+                    . '$("document").ready(function(){'
+                    . '$("#error").removeClass("d-none");'
+                    . '}); </script>';
                 }
             }
             ?>
@@ -226,7 +235,7 @@ if (isset($_POST['cyear']) && $_POST['cyear']) {
                 $term = mysqli_real_escape_string($conn, $_REQUEST['mail']);
                 $sql = "SELECT * FROM student_register WHERE email LIKE '%" . $term . "%'";
                 $r_query = mysqli_query($conn, $sql);
-                if ($r_query) {
+                if (mysqli_num_rows($r_query) > 0) {
                     while ($row = mysqli_fetch_array($r_query)) {
                         $n_id = $row['id'];
                         $n_fname = $row['fname'];
@@ -256,6 +265,10 @@ if (isset($_POST['cyear']) && $_POST['cyear']) {
                     }
                 } else {
                     $_SESSION['msg'] = 'No records found!';
+                    echo '<script> '
+                    . '$("document").ready(function(){'
+                    . '$("#error").removeClass("d-none");'
+                    . '}); </script>';
                 }
             }
             ?>
@@ -265,41 +278,41 @@ if (isset($_POST['cyear']) && $_POST['cyear']) {
                 $year = $_POST['year'];
                 $filter_year = "select * from student_register where year='" . $year . "'and status=1;";
                 $filter_y = mysqli_query($conn, $filter_year);
-                if ($filter_y) {
 //                    echo 'Entered first if'; exit;
-                    if (mysqli_num_rows($filter_y) != 0) {
-                        while ($y = mysqli_fetch_array($filter_y, MYSQLI_ASSOC)) {
-                            $y_id = $y['id'];
-                            $y_fname = $y['fname'];
-                            $y_lname = $y['lname'];
-                            $y_email = $y['email'];
-                            $y_gender = $y['gender'];
-                            $y_phno = $y['phno'];
-                            $y_branch = $y['branch'];
-                            $y_year = $y['year'];
+                if (mysqli_num_rows($filter_y) > 0) {
+                    while ($y = mysqli_fetch_array($filter_y, MYSQLI_ASSOC)) {
+                        $y_id = $y['id'];
+                        $y_fname = $y['fname'];
+                        $y_lname = $y['lname'];
+                        $y_email = $y['email'];
+                        $y_gender = $y['gender'];
+                        $y_phno = $y['phno'];
+                        $y_branch = $y['branch'];
+                        $y_year = $y['year'];
 //                                                    $b_image = $b['image'];
-                            ?>
-                            <tr>
-                                <td><?= $y_id; ?></td>
-                                <td><?= $y_fname; ?></td>
-                                <td><?= $y_lname; ?></td>
-                                <td><?= $y_email; ?></td>
-                                <td><?= $y_gender; ?></td>
-                                <td><?= $y_phno; ?></td>
-                                <td><?= $y_branch; ?></td>                                           
-                                <td><?= $y_year; ?></td>                                               
-                                <td>
-                                    <i class="fas fa-user-edit mr-2 btn" onclick="filterstudentdetails('<?= $y_id; ?>')"></i> 
-                                    <i class="fas fa-trash text-danger btn" onclick="filterdeletestudentdetails('<?= $y_id; ?>')"></i>
-                                </td>
-                            </tr> 
-                            <?php
-                        }
-                    } else {
-                        $_SESSION['msg'] = "No records found!";
+                        ?>
+                        <tr>
+                            <td><?= $y_id; ?></td>
+                            <td><?= $y_fname; ?></td>
+                            <td><?= $y_lname; ?></td>
+                            <td><?= $y_email; ?></td>
+                            <td><?= $y_gender; ?></td>
+                            <td><?= $y_phno; ?></td>
+                            <td><?= $y_branch; ?></td>                                           
+                            <td><?= $y_year; ?></td>                                               
+                            <td>
+                                <i class="fas fa-user-edit mr-2 btn" onclick="filterstudentdetails('<?= $y_id; ?>')"></i> 
+                                <i class="fas fa-trash text-danger btn" onclick="filterdeletestudentdetails('<?= $y_id; ?>')"></i>
+                            </td>
+                        </tr> 
+                        <?php
                     }
                 } else {
-                    echo("<script>tostar.error('Query not executed!');</script>");
+                    $_SESSION['msg'] = "No records found!";
+                    echo '<script> '
+                    . '$("document").ready(function(){'
+                    . '$("#error").removeClass("d-none");'
+                    . '}); </script>';
                 }
             }
             ?>
@@ -339,9 +352,13 @@ if (isset($_POST['cyear']) && $_POST['cyear']) {
                             </tr> 
                             <?php
                         }
-                    } else {
-                        $_SESSION['msg'] = "No records found!";
                     }
+                } else {
+                    $_SESSION['msg'] = "No records found!";
+                    echo '<script> '
+                    . '$("document").ready(function(){'
+                    . '$("#error").removeClass("d-none");'
+                    . '}); </script>';
                 }
             }
             ?>
@@ -424,17 +441,17 @@ if (isset($_POST['edit'])) {
     }
 }
 ?>
-<script>    
+<script>
     $('document').ready(function () {
-        $('#csel').first().submit(function(){
+        $('#csel').first().submit(function () {
             let cbran = $('#cbran').val();
             let cyear = $('#cyear').val();
-            if(cbran == ''){
+            if (cbran == '') {
                 toastr.error('Select Branch');
                 $('#cbran').focus();
                 return false;
             }
-            if(cyear == ''){
+            if (cyear == '') {
                 toastr.error('Select Year');
                 $('#cyear').focus();
                 return false;
